@@ -7,18 +7,30 @@ function md({ t: e, p: t, d: n }) {
 
   let sc = 1000;
 
-  WebSocket.prototype.send = function () {
-    if (o) {
-      const m = modifyOutgoingData(arguments[0]);
-      arguments[0] = m;
-      const intervalId = setInterval(() => {
-        c.apply(this, arguments);
-      }, sc);
-      d.push(intervalId);
-    } else {
-      c.apply(this, arguments);
-    }
-  };
+  let setOnMessage = Object.getOwnPropertyDescriptors(WebSocket.prototype).onmessage.set;
+
+  Object.defineProperty(WebSocket.prototype, "onmessage", {
+    set: function () {
+      let originalOnMessage = () => {};
+
+      if (typeof arguments[0] === "function") {
+        originalOnMessage = arguments[0];
+
+        arguments[0] = function () {
+          if (o) {
+            const intervalId = setInterval(() => {
+              originalOnMessage.apply(this, arguments);
+            }, sc);
+            d.push(intervalId);
+          } else {
+            originalOnMessage.apply(this, arguments);
+          }
+        };
+      }
+
+      setOnMessage.apply(this, arguments);
+    },
+  });
 
   document.addEventListener('keydown', (t) => {
     if (t.code == e) {
