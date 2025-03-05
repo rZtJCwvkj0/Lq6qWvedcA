@@ -1,0 +1,188 @@
+(function() {
+    'use strict';
+
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '100px';
+    container.style.left = '100px';
+    container.style.width = '200px';
+    container.style.backgroundColor = '#333';
+    container.style.border = '2px solid #000';
+    container.style.borderRadius = '10px';
+    container.style.padding = '10px';
+    container.style.color = '#fff';
+    container.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    container.style.zIndex = '10000';
+    container.style.cursor = 'move';
+    container.style.display = 'block';
+
+    const title = document.createElement('div');
+    title.textContent = 'Gaming-style cheats';
+    title.style.fontSize = '16px';
+    title.style.marginBottom = '10px';
+    title.style.textAlign = 'center';
+    title.style.borderBottom = '1px solid #555';
+    title.style.paddingBottom = '5px';
+    container.appendChild(title);
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - container.offsetLeft;
+        offsetY = e.clientY - container.offsetTop;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            container.style.left = `${e.clientX - offsetX}px`;
+            container.style.top = `${e.clientY - offsetY}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    const labels = ['God mode', 'Ghost mode', 'Invisibility', 'Instakill', 'Crash'];
+    const state = {};
+
+    let rt = false;
+    let rt2 = false;
+    let rt3 = false;
+    let rt4 = false;
+    let rt5 = false;
+
+    const runCode = (label, stateValue) => {
+        if (label === 'God mode') {
+            rt = stateValue;
+        } else if (label === 'Ghost mode') {
+            rt2 = stateValue;
+        } else if (label === 'Invisibility') {
+            rt3 = stateValue;
+        } else if (label === 'Instakill') {
+            rt4 = stateValue;
+        } else if (label === 'Crash') {
+            rt5 = stateValue;
+        }
+    };
+
+    const activateWebSocketCode = () => {
+        let messageSymbol = Symbol();
+
+        window.WebSocket = new Proxy(WebSocket, {
+            construct(target, args) {
+                const instance = Reflect.construct(target, args);
+
+                if (args[0]?.includes("games")) {
+                    messageSymbol = instance;
+                }
+
+                const originalSend = instance.send;
+                instance.send = function(data) {
+                    if (rt2 && (data instanceof ArrayBuffer && data.byteLength >= 80 && data.byteLength <= 90)) {
+                        return;
+                    }
+                    originalSend.call(this, data);
+                };
+
+                const originalSend2 = instance.send;
+                instance.send = function(data) {
+                    if (rt3 && (data instanceof ArrayBuffer && data.byteLength >= 80 && data.byteLength <= 90)) {
+                        let byteArray = new Uint8Array(data);
+
+                        const positionsToModify = [30];
+
+                        positionsToModify.forEach(pos => {
+                            if (pos < byteArray.length) {
+                                byteArray[pos] = 90;
+                            }
+                        });
+
+                        const modifiedData = byteArray.buffer;
+
+                        originalSend2.call(this, modifiedData);
+                        return;
+                    }
+
+                    originalSend2.call(this, data);
+                };
+
+                const originalSend3 = instance.send;
+                instance.send = function(data) {
+                    if (rt4 && (data instanceof ArrayBuffer && data.byteLength >= 201 && data.byteLength <= 220)) {
+                        for (let i = 0; i < 10; i++) {
+                            originalSend3.call(this, data);
+                        }
+                        return;
+                    }
+                    originalSend3.call(this, data);
+                };
+
+                Object.defineProperty(instance, "onmessage", {
+                    set(handler) {
+                        this._onmessage = handler;
+                    }
+                });
+
+                instance.addEventListener("message", function(event) {
+                    const data = new Uint8Array(event.data);
+                    if (rt && (data.byteLength >= 201 && data.byteLength <= 220)) {
+                        return;
+                    }
+                    if (this._onmessage) {
+                        this._onmessage.apply(this, arguments);
+                    }
+                });
+
+                const byteSequence = new Uint8Array([243, 2, 227, 1, 255, 7, 6, 117, 115, 50, 51, 56, 51]);
+
+                const checkWebSocketInterval = setInterval(() => {
+                    if (instance.readyState === WebSocket.OPEN && rt5) {
+                        instance.send(byteSequence);
+                    }
+                }, 0);
+
+                return instance;
+            }
+        });
+    };
+
+    activateWebSocketCode();
+
+    labels.forEach(label => {
+        const checkboxContainer = document.createElement('div');
+        checkboxContainer.style.marginBottom = '10px';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `checkbox-${label}`;
+        checkbox.style.marginRight = '10px';
+        state[label] = false;
+
+        checkbox.addEventListener('change', () => {
+            state[label] = checkbox.checked;
+            console.log(`${label} is ${checkbox.checked ? 'ON' : 'OFF'}`);
+            runCode(label, state[label]);
+        });
+
+        const labelElement = document.createElement('label');
+        labelElement.htmlFor = `checkbox-${label}`;
+        labelElement.textContent = label;
+
+        checkboxContainer.appendChild(checkbox);
+        checkboxContainer.appendChild(labelElement);
+        container.appendChild(checkboxContainer);
+    });
+
+    document.body.appendChild(container);
+
+    let isEnabled = true;
+    document.addEventListener('keydown', (event) => {
+        if (event.key === '/') {
+            isEnabled = !isEnabled;
+            container.style.display = isEnabled ? 'block' : 'none';
+        }
+    });
+})();
