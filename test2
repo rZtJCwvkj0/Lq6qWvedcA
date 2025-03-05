@@ -17,7 +17,7 @@
     container.style.display = 'block';
 
     const title = document.createElement('div');
-    title.textContent = 'Gaming-style cheats';
+    title.textContent = 'Gaming-style test';
     title.style.fontSize = '16px';
     title.style.marginBottom = '10px';
     title.style.textAlign = 'center';
