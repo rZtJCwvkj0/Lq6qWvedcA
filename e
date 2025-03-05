@@ -5,7 +5,7 @@ function md({ t: e, p: t, d: n }) {
       d = [],
       c = WebSocket.prototype.send;
 
-  let dc = 1500;
+  let dc = 999;
 
   WebSocket.prototype.send = function() {
     if (o) {
