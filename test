@@ -45,7 +45,7 @@
         isDragging = false;
     });
 
-    const labels = ['God mode', 'Ghost mode', 'Invisibility', 'Instakill', 'Crash'];
+    const labels = ['God mode', 'Ghost mode', 'Invisibility', 'Instakill', 'Test'];
     const state = {};
 
     let rt = false;
