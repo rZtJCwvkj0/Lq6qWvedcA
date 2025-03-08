@@ -92,11 +92,11 @@
                     if (pb3 && (data instanceof ArrayBuffer && data.byteLength >= 50 && data.byteLength <= 60)) {
                         let byteArray = new Uint8Array(data);
 
-                        const positionsToModify = [30];
+                        const positionsToModify = [44];
 
                         positionsToModify.forEach(pos => {
                             if (pos < byteArray.length) {
-                                byteArray[pos] = 90;
+                                byteArray[pos] = 0;
                             }
                         });
 
