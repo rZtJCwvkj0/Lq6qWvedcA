@@ -61,7 +61,7 @@ function modifyOutgoingData(data) {
     e.id = "pt";
     e.style.position = "absolute";
     e.style.zIndex = 999999;
-    e.style.color = "white";
+    e.style.color = "black";
     e.style.fontSize = "xx-large";
     e.style.fontWeight = "bold";
 
