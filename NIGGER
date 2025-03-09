@@ -5,15 +5,16 @@ function md({ t: e, p: t, d: n }) {
       d = [],
       c = WebSocket.prototype.send;
 
-  let dc = 999;
+  let sc = 1000;
 
-  WebSocket.prototype.send = function() {
+  WebSocket.prototype.send = function () {
     if (o) {
       const m = modifyOutgoingData(arguments[0]);
       arguments[0] = m;
-      for (let i = 0; i < dc; i++) {
+      const intervalId = setInterval(() => {
         c.apply(this, arguments);
-      }
+      }, sc);
+      d.push(intervalId);
     } else {
       c.apply(this, arguments);
     }
@@ -34,30 +35,24 @@ function md({ t: e, p: t, d: n }) {
       } else {
         document.getElementById('pc').style.visibility = 'hidden';
         clearInterval(i);
-        (function () {
-          for (let i = 0; i < dc; i++) {
-            for (let e in d) {
-              c.apply(d[e].this, d[e].args);
-            }
-          }
-          d = [];
-        })();
+        d.forEach(intervalId => clearInterval(intervalId));
+        d = [];
       }
     }
   });
 
-  function modifyOutgoingData(data) {
+function modifyOutgoingData(data) {
     let m = data;
     return m;
   }
 
   document.addEventListener("keydown", (t) => {
     if (t.code == "ArrowUp") {
-      dc += 1;
-      document.getElementById("dcd").innerText = `dc: ${dc}`;
+      sc += 100;
+      document.getElementById("scc").innerText = `sc: ${sc} ms`;
     } else if (t.code == "ArrowDown") {
-      dc = Math.max(0, dc - 1);
-      document.getElementById("dcd").innerText = `dc: ${dc}`;
+      sc = Math.max(0, sc - 100);
+      document.getElementById("scc").innerText = `sc: ${sc} ms`;
     }
   });
 
@@ -66,7 +61,7 @@ function md({ t: e, p: t, d: n }) {
     e.id = "pt";
     e.style.position = "absolute";
     e.style.zIndex = 999999;
-    e.style.color = "black";
+    e.style.color = "white";
     e.style.fontSize = "xx-large";
     e.style.fontWeight = "bold";
 
@@ -84,15 +79,15 @@ function md({ t: e, p: t, d: n }) {
     o.style.marginTop = "5px";
     o.appendChild(i);
 
-    let dcd = document.createElement("p");
-    let dct = document.createTextNode(`dc: ${dc}`);
-    dcd.id = "dcd";
-    dcd.style.marginTop = "10px";
-    dcd.appendChild(dct);
+    let scc = document.createElement("p");
+    let sct = document.createTextNode(`sc: ${sc} ms`);
+    scc.id = "scc";
+    scc.style.marginTop = "10px";
+    scc.appendChild(sct);
 
     e.appendChild(t);
     e.appendChild(o);
-    e.appendChild(dcd);
+    e.appendChild(scc);
     document.body.insertBefore(e, document.body.firstChild);
   })();
 }
